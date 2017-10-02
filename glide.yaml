@@ -1,4 +1,4 @@
-package: github.com/HarySimpson/pilotage
+package: github.com/HardySimpson/pilotage
 import: 
 - package: k8s.io/client-go
   version: c6f8cf2c47d21d55fa0df928291b2580544886c8
@@ -8,3 +8,20 @@ import:
   version: a28c9b0b532638dcfb2c8b1b6f8f1e4a21041752
 - package: k8s.io/apiextensions-apiserver
   version: 2bfb07d318ed549813240d1165fcebad6250c666
+- package: github.com/abiosoft/ishell
+  version: 1fe4da16846908f352ed09310705a9c84f4b9f97
+- package: github.com/chzyer/readline
+  version: aa9ed7db496e1e26f67e8f8acb0f419be1dfc4a5
+- package: github.com/fatih/color
+  version: 5df930a27be2502f99b292b7cc09ebad4d0891f4
+- package: github.com/flynn-archive/go-shlex
+  version: 3f9db97f856818214da2e1057f8ad84803971cff
+- package: github.com/mattn/go-colorable
+  version: 5411d3eea5978e6cdc258b30de592b60df6aba96
+  repo: https://github.com/mattn/go-colorable
+- package: github.com/mattn/go-isatty
+  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+  repo: https://github.com/mattn/go-isatty
+- package: golang.org/x/sys/unix
+  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+testImports: []
