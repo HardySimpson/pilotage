@@ -1,0 +1,28 @@
+#!/bin/sh -e
+
+# set some environment variables
+ORG_PATH="github.com/HardySimpson"
+REPO_PATH="${ORG_PATH}/pilotage"
+export GO15VENDOREXPERIMENT="1"
+
+eval $(go env)
+GIT_SHA=`git rev-parse --short HEAD || echo "GitNotFound"`
+if [ ! -z "$FAILPOINTS" ]; then
+	GIT_SHA="$GIT_SHA"-FAILPOINTS
+fi
+
+# Set GO_LDFLAGS="-s" for building without symbols for debugging.
+GO_LDFLAGS="$GO_LDFLAGS -X ${REPO_PATH}/pkg/version.GitSHA=${GIT_SHA}"
+
+
+pilotage_build() {
+	out="bin"
+	if [ -n "${BINDIR}" ]; then out="${BINDIR}"; fi
+	# Static compilation is useful when pilotage is run in a container
+	CGO_ENABLED=0 go build $GO_BUILD_FLAGS -installsuffix cgo -ldflags "$GO_LDFLAGS" -o ${out}/pilotage ${REPO_PATH}/cmd/pilotage || return
+}
+
+# only build when called directly, not sourced
+if echo "$0" | grep "build$" >/dev/null; then
+	pilotage_build
+fi
