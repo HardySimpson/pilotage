@@ -1,7 +1,5 @@
 package vfs
 
-import "fmt"
-
 type Node struct {
 	Name    string
 	Children map[string]*Node
@@ -27,10 +25,8 @@ func (n *Node) GetChild(name string) *Node {
 	return n.Children[name]
 }
 
-func (n *Node) ListChilds() []string {
+func (n *Node) ListChildrenName() []string {
 	l := []string{}
-
-	fmt.Println("child", n.Children)
 
 	for k, _ := range n.Children {
 		l = append(l, k)

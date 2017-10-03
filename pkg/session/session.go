@@ -1,4 +1,4 @@
-package cmd
+package session
 
 import (
 	"sync"
@@ -25,7 +25,7 @@ func (s *Session) cd(c *ishell.Context) {
 	args := c.Args
 
 	if len(args) > 1 {
-		c.Println("pilotage: too many arguments")
+		c.Println("pilotage cd: too many arguments")
 	} else if len(args) == 0 {
 		s.path = "/"
 		s.currentNode = s.vfs.RootNode
@@ -34,6 +34,9 @@ func (s *Session) cd(c *ishell.Context) {
 			s.currentNode = s.currentNode.Parent
 			s.path = path.Dir(s.path)
 		}
+	} else if args[0] == "." {
+		//do nothing
+		return
 	}
 
 	n := s.currentNode.GetChild(args[0])
@@ -41,6 +44,13 @@ func (s *Session) cd(c *ishell.Context) {
 		s.currentNode = n
 		s.path = path.Join(s.path, args[0])
 	}
+
+	s.SetPrompt(s.path + "$ ")
+
+}
+
+func (s *Session) cdCompleter(args []string) []string {
+	return s.currentNode.ListChildrenName()
 
 }
 
@@ -54,7 +64,7 @@ func (s *Session) ls(c *ishell.Context) {
 		s.currentNode.Fresh()
 	}
 	*/
-	s.Shell.Println(strings.Join(s.currentNode.ListChilds(), ""))
+	s.Shell.Println(strings.Join(s.currentNode.ListChildrenName(), " "))
 }
 
 
@@ -71,17 +81,20 @@ func New(k kubernetes.Interface) *Session {
 		Name: "cd",
 		Help: "change to a path",
 		Func: s.cd,
+		Completer: s.cdCompleter,
 	})
 	s.AddCmd(&ishell.Cmd{
 		Name: "ls",
-		Help: "change to a path",
+		Help: "list sub object",
 		Func: s.ls,
 	})
 	s.AddCmd(&ishell.Cmd{
 		Name: "pwd",
-		Help: "change to a path",
+		Help: "show path",
 		Func: s.pwd,
 	})
+
+	s.SetPrompt("/$ ")
 
 	nsd := s.vfs.RootNode.AddChild("namespaces", nil, nil)
 

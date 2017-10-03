@@ -14,5 +14,5 @@ func TestNewVFS(t *testing.T) {
 	nd.AddChild("aa", nil, nil)
 	nd.AddChild("bb", nil, nil)
 
-	fmt.Println(strings.Join(nd.ListChilds(), " "))
+	fmt.Println(strings.Join(nd.ListChildrenName(), " "))
 }
