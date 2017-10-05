@@ -1,24 +1,46 @@
 package vfs
 
+import "path"
+
 type Node struct {
 	Name    string
 	Children map[string]*Node
+	Path 	string
 	Parent  *Node
 	Obj 	interface{}
-	Fresh  FreshFunc
+	FreshFunc   FreshChildFunc
 }
 
-type FreshFunc func()
+type FreshChildFunc func(PrevObj interface{}) ([]*Node, interface{}, error)
 
-func (n *Node) AddChild(name string, obj interface{}, fresh FreshFunc) *Node {
-	nd := &Node {
-		Name: name,
-		Children: make(map[string]*Node),
-		Parent: n,
-		Obj: obj,
+
+func (n *Node) AddChild(child *Node) *Node {
+	child.Parent = n
+	child.Path = path.Join(n.Path, child.Name)
+	if n.Children == nil {
+		n.Children = make(map[string]*Node)
 	}
-	n.Children[name] = nd
-	return nd
+	n.Children[child.Name] = child
+	return child
+}
+
+func (n *Node) AddChildren(children []*Node) {
+	for _, child := range children {
+		n.AddChild(child)
+	}
+}
+
+func (n *Node) FreshChildren() *Node{
+	if n.FreshFunc == nil {
+		return n
+	}
+	children, obj, err := n.FreshFunc(n.Obj)
+	if err != nil {
+		// log error
+	}
+	n.AddChildren(children)
+	n.Obj = obj
+	return n
 }
 
 func (n *Node) GetChild(name string) *Node {

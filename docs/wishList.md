@@ -11,8 +11,9 @@
 * [ ] Readme: run/build doc
 * [ ] Pipe
 * [ ] Refresh
-
+* [ ] any path cd
 ## Big Question
 
 * fix how to build and running apps, 合理的抽象模型
 
+1. ​

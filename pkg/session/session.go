@@ -2,7 +2,6 @@ package session
 
 import (
 	"sync"
-	"path"
 
 	"github.com/abiosoft/ishell"
 	"github.com/HardySimpson/pilotage/pkg/vfs"
@@ -26,12 +25,10 @@ func (s *Session) cd(c *ishell.Context) {
 	if len(args) > 1 {
 		c.Println("pilotage cd: too many arguments")
 	} else if len(args) == 0 {
-		s.path = "/"
 		s.currentNode = s.vfs.RootNode
 	} else if args[0] == ".." {
 		if s.currentNode.Parent != nil {
 			s.currentNode = s.currentNode.Parent
-			s.path = path.Dir(s.path)
 		}
 	} else if args[0] == "." {
 		//do nothing
@@ -41,11 +38,14 @@ func (s *Session) cd(c *ishell.Context) {
 	n := s.currentNode.GetChild(args[0])
 	if n != nil {
 		s.currentNode = n
-		s.path = path.Join(s.path, args[0])
 	}
 
-	s.SetPrompt(s.path + "$ ")
+	s.SetPrompt(s.currentNode.Path + "$ ")
 
+}
+
+func (s *Session) inspect(c *ishell.Context) {
+	s.Println(s.currentNode)
 }
 
 func (s *Session) cdCompleter(args []string) []string {
@@ -54,7 +54,7 @@ func (s *Session) cdCompleter(args []string) []string {
 }
 
 func (s *Session) pwd(c *ishell.Context) {
-	s.Shell.Println(s.path)
+	s.Shell.Println(s.currentNode.Path)
 }
 
 func (s *Session) ls(c *ishell.Context) {
@@ -71,7 +71,6 @@ func New(k kubernetes.Interface) *Session {
 	s := &Session{
 		Shell: ishell.New(),
 		kubecli: k,
-		path: "/",
 		vfs: vfs.NewVFS(),
 	}
 	s.currentNode = s.vfs.RootNode
@@ -91,6 +90,11 @@ func New(k kubernetes.Interface) *Session {
 		Name: "pwd",
 		Help: "show path",
 		Func: s.pwd,
+	})
+	s.AddCmd(&ishell.Cmd{
+		Name: "inspect",
+		Help: "inspect current vfs.Node",
+		Func: s.inspect,
 	})
 
 	s.SetPrompt("/$ ")
