@@ -6,6 +6,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+
 func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 
 	nsDirNode := node.AddChild(&vfs.Node{
@@ -39,6 +40,72 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 			},
 
 		}).FreshChildren()
+
+		nsNode.AddChild(&vfs.Node{
+			Name: "configmaps",
+			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+				mp := []*vfs.Node{}
+				list, err := cli.CoreV1().ConfigMaps(nsNode.Name).List(metav1.ListOptions{})
+				if err != nil {
+					return nil, nil, err
+				}
+				for _, item := range list.Items {
+					mp = append(mp, &vfs.Node{Name:item.Name})
+				}
+				return mp, list, nil
+			},
+
+		}).FreshChildren()
+
+
+		nsNode.AddChild(&vfs.Node{
+			Name: "endpoints",
+			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+				mp := []*vfs.Node{}
+				list, err := cli.CoreV1().Endpoints(nsNode.Name).List(metav1.ListOptions{})
+				if err != nil {
+					return nil, nil, err
+				}
+				for _, item := range list.Items {
+					mp = append(mp, &vfs.Node{Name:item.Name})
+				}
+				return mp, list, nil
+			},
+
+		}).FreshChildren()
+
+		nsNode.AddChild(&vfs.Node{
+			Name: "services",
+			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+				mp := []*vfs.Node{}
+				list, err := cli.CoreV1().Services(nsNode.Name).List(metav1.ListOptions{})
+				if err != nil {
+					return nil, nil, err
+				}
+				for _, item := range list.Items {
+					mp = append(mp, &vfs.Node{Name:item.Name})
+				}
+				return mp, list, nil
+			},
+
+		}).FreshChildren()
+
+		nsNode.AddChild(&vfs.Node{
+			Name: "secrets",
+			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+				mp := []*vfs.Node{}
+				list, err := cli.CoreV1().Secrets(nsNode.Name).List(metav1.ListOptions{})
+				if err != nil {
+					return nil, nil, err
+				}
+				for _, item := range list.Items {
+					mp = append(mp, &vfs.Node{Name:item.Name})
+				}
+				return mp, list, nil
+			},
+
+		}).FreshChildren()
+
 
 		/*
 		for _, nsObj := range nsList.Items {
