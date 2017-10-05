@@ -34,18 +34,16 @@ func NewKubeClient() kubernetes.Interface {
 	}
 	flag.Parse()
 
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := InClusterConfig()
 	if err != nil {
-		panic(err.Error())
+		// use the current context in kubeconfig
+		config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
-	/*
-	cfg, err := InClusterConfig()
-	if err != nil {
-		panic(err)
-	}
-	*/
+
 	return kubernetes.NewForConfigOrDie(config)
 }
 
@@ -55,7 +53,7 @@ func InClusterConfig() (*rest.Config, error) {
 	if len(os.Getenv("KUBERNETES_SERVICE_HOST")) == 0 {
 		addrs, err := net.LookupHost("kubernetes.default.svc")
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		os.Setenv("KUBERNETES_SERVICE_HOST", addrs[0])
 	}

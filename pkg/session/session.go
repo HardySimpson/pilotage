@@ -6,7 +6,6 @@ import (
 
 	"github.com/abiosoft/ishell"
 	"github.com/HardySimpson/pilotage/pkg/vfs"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"strings"
 )
@@ -96,12 +95,8 @@ func New(k kubernetes.Interface) *Session {
 
 	s.SetPrompt("/$ ")
 
-	nsd := s.vfs.RootNode.AddChild("namespaces", nil, nil)
+	addDefaultTree(s.vfs.RootNode, s.kubecli)
 
-	nss, _ := s.kubecli.CoreV1().Namespaces().List(metav1.ListOptions{})
-	for _, ns := range nss.Items {
-		nsd.AddChild(ns.Name, ns, nil)
-	}
 
 	return s
 }

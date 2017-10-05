@@ -1,13 +1,16 @@
 * [x] prompt display
 * [x] cd auto completion
+* [x] kube-config args
+* [ ] inCluster running
 * [ ] new command like cat/new/filter....
+* [ ] vi to change yaml
 * [ ] file tree definition
     * tag system
     * ​
-* [ ] kube-config args
-* [ ] inCluster running
 * [ ] shell scripts grammer (powershell/haskell)
 * [ ] Readme: run/build doc
+* [ ] Pipe
+* [ ] Refresh
 
 ## Big Question
 
