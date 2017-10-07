@@ -58,11 +58,7 @@ func (s *Session) pwd(c *ishell.Context) {
 }
 
 func (s *Session) ls(c *ishell.Context) {
-	/*
-	if s.currentNode.Fresh != nil {
-		s.currentNode.Fresh()
-	}
-	*/
+	s.currentNode.FreshChildren()
 	s.Shell.Println(strings.Join(s.currentNode.ListChildrenName(), " "))
 }
 

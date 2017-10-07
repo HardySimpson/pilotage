@@ -38,6 +38,7 @@ func (n *Node) FreshChildren() *Node{
 	if err != nil {
 		// log error
 	}
+	n.Children = nil
 	n.AddChildren(children)
 	n.Obj = obj
 	return n

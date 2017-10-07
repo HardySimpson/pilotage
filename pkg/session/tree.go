@@ -6,10 +6,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// TODO: flat the code here
 
 func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
-
-	nsDirNode := node.AddChild(&vfs.Node{
+	node.AddChild(&vfs.Node{
 		Name: "namespaces",
 		FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
 			mp := []*vfs.Node{}
@@ -18,113 +18,86 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 				return nil, nil, err
 			}
 			for _, nsObj := range nsList.Items {
-				mp = append(mp, &vfs.Node{Name:nsObj.Name})
+				nd := &vfs.Node{Name:nsObj.Name}
+				nd.FreshFunc = func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+					return []*vfs.Node{
+						&vfs.Node{
+							Name: "pods",
+							FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+								mp := []*vfs.Node{}
+								podList, err := cli.CoreV1().Pods(nd.Name).List(metav1.ListOptions{})
+								if err != nil {
+									return nil, nil, err
+								}
+								for _, podObj := range podList.Items {
+									mp = append(mp, &vfs.Node{Name:podObj.Name})
+								}
+								return mp, podList, nil
+							},
+
+						},
+						&vfs.Node{
+							Name: "configmaps",
+							FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+								mp := []*vfs.Node{}
+								list, err := cli.CoreV1().ConfigMaps(nd.Name).List(metav1.ListOptions{})
+								if err != nil {
+									return nil, nil, err
+								}
+								for _, item := range list.Items {
+									mp = append(mp, &vfs.Node{Name:item.Name})
+								}
+								return mp, list, nil
+							},
+						},
+						&vfs.Node{
+							Name: "endpoints",
+							FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+								mp := []*vfs.Node{}
+								list, err := cli.CoreV1().Endpoints(nd.Name).List(metav1.ListOptions{})
+								if err != nil {
+									return nil, nil, err
+								}
+								for _, item := range list.Items {
+									mp = append(mp, &vfs.Node{Name:item.Name})
+								}
+								return mp, list, nil
+							},
+						},
+						&vfs.Node{
+							Name: "services",
+							FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+								mp := []*vfs.Node{}
+								list, err := cli.CoreV1().Services(nd.Name).List(metav1.ListOptions{})
+								if err != nil {
+									return nil, nil, err
+								}
+								for _, item := range list.Items {
+									mp = append(mp, &vfs.Node{Name:item.Name})
+								}
+								return mp, list, nil
+							},
+						},
+						&vfs.Node{
+							Name: "secrets",
+							FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
+								mp := []*vfs.Node{}
+								list, err := cli.CoreV1().Secrets(nd.Name).List(metav1.ListOptions{})
+								if err != nil {
+									return nil, nil, err
+								}
+								for _, item := range list.Items {
+									mp = append(mp, &vfs.Node{Name:item.Name})
+								}
+								return mp, list, nil
+							},
+						},
+					}, nd, nil
+				}
+				mp = append(mp, nd)
 			}
 			return mp, nsList, nil
 		},
 	}).FreshChildren()
 
-	for _, nsNode := range nsDirNode.Children {
-		nsNode.AddChild(&vfs.Node{
-			Name: "pods",
-			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
-				mp := []*vfs.Node{}
-				podList, err := cli.CoreV1().Pods(nsNode.Name).List(metav1.ListOptions{})
-				if err != nil {
-					return nil, nil, err
-				}
-				for _, podObj := range podList.Items {
-					mp = append(mp, &vfs.Node{Name:podObj.Name})
-				}
-				return mp, podList, nil
-			},
-
-		}).FreshChildren()
-
-		nsNode.AddChild(&vfs.Node{
-			Name: "configmaps",
-			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
-				mp := []*vfs.Node{}
-				list, err := cli.CoreV1().ConfigMaps(nsNode.Name).List(metav1.ListOptions{})
-				if err != nil {
-					return nil, nil, err
-				}
-				for _, item := range list.Items {
-					mp = append(mp, &vfs.Node{Name:item.Name})
-				}
-				return mp, list, nil
-			},
-
-		}).FreshChildren()
-
-
-		nsNode.AddChild(&vfs.Node{
-			Name: "endpoints",
-			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
-				mp := []*vfs.Node{}
-				list, err := cli.CoreV1().Endpoints(nsNode.Name).List(metav1.ListOptions{})
-				if err != nil {
-					return nil, nil, err
-				}
-				for _, item := range list.Items {
-					mp = append(mp, &vfs.Node{Name:item.Name})
-				}
-				return mp, list, nil
-			},
-
-		}).FreshChildren()
-
-		nsNode.AddChild(&vfs.Node{
-			Name: "services",
-			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
-				mp := []*vfs.Node{}
-				list, err := cli.CoreV1().Services(nsNode.Name).List(metav1.ListOptions{})
-				if err != nil {
-					return nil, nil, err
-				}
-				for _, item := range list.Items {
-					mp = append(mp, &vfs.Node{Name:item.Name})
-				}
-				return mp, list, nil
-			},
-
-		}).FreshChildren()
-
-		nsNode.AddChild(&vfs.Node{
-			Name: "secrets",
-			FreshFunc: func(prevObj interface{}) ([]*vfs.Node, interface{}, error) {
-				mp := []*vfs.Node{}
-				list, err := cli.CoreV1().Secrets(nsNode.Name).List(metav1.ListOptions{})
-				if err != nil {
-					return nil, nil, err
-				}
-				for _, item := range list.Items {
-					mp = append(mp, &vfs.Node{Name:item.Name})
-				}
-				return mp, list, nil
-			},
-
-		}).FreshChildren()
-
-
-		/*
-		for _, nsObj := range nsList.Items {
-			nsNode := nsDirNode.AddChild(nsObj.Name, nsObj, nil)
-
-			podDirNode := nsNode.AddChild("pods", nil, nil)
-			podList, _ := cli.CoreV1().Pods(nsObj.Name).List(metav1.ListOptions{})
-			for _, podObj := range podList.Items {
-
-				podDirNode.AddChild(podObj.Name, podObj, nil)
-			}
-
-			deployDirNode := nsNode.AddChild("deployments", nil, nil)
-			deployList, _ := cli.Extensions().Deployments(nsObj.Name).List(metav1.ListOptions{})
-			for _, deployObj := range deployList.Items {
-				deployDirNode.AddChild(deployObj.Name, deployObj, nil)
-			}
-
-		}
-		*/
-	}
 }
