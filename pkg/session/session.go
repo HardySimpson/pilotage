@@ -1,12 +1,12 @@
 package session
 
 import (
-	"sync"
-
 	"github.com/abiosoft/ishell"
 	"github.com/HardySimpson/pilotage/pkg/vfs"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"strings"
+	"fmt"
 )
 
 
@@ -16,7 +16,8 @@ type Session struct {
 	path string
 	vfs *vfs.VFS
 	currentNode *vfs.Node
-	lock sync.Mutex
+	pathHeader string
+
 }
 
 func (s *Session) cd(c *ishell.Context) {
@@ -40,7 +41,7 @@ func (s *Session) cd(c *ishell.Context) {
 		s.currentNode = n
 	}
 
-	s.SetPrompt(s.currentNode.Path + "$ ")
+	s.SetPrompt(s.pathHeader + s.currentNode.Path + "/$ ")
 
 }
 
@@ -74,11 +75,13 @@ func (s *Session) cat(c *ishell.Context) {
 
 	n = s.currentNode.GetChild(args[0])
 
-	s.Shell.Print(n.CatNode())
+	if n != nil {
+		s.Shell.Print(n.CatNode())
+	}
 }
 
 
-func New(k kubernetes.Interface) *Session {
+func New(k kubernetes.Interface, config *rest.Config) *Session {
 	s := &Session{
 		Shell: ishell.New(),
 		kubecli: k,
@@ -114,7 +117,8 @@ func New(k kubernetes.Interface) *Session {
 		Func: s.inspect,
 	})
 
-	s.SetPrompt("/$ ")
+	s.pathHeader = fmt.Sprintf("pilotage-%v@%v:/", config.Username, config.Host)
+	s.SetPrompt(s.pathHeader + "$ ")
 
 	addDefaultTree(s.vfs.RootNode, s.kubecli)
 

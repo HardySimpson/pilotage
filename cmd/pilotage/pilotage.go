@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	kubecli := k8sclient.NewKubeClient()
-	s := session.New(kubecli)
+	kubecli, config := k8sclient.NewKubeClient()
+	s := session.New(kubecli, config)
 	// run shell in session
 	s.Run()
 }

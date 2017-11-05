@@ -25,7 +25,7 @@ import (
 	"path/filepath"
 )
 
-func NewKubeClient() kubernetes.Interface {
+func NewKubeClient() (kubernetes.Interface, *rest.Config) {
 	var kubeconfig *string
 	if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -44,7 +44,7 @@ func NewKubeClient() kubernetes.Interface {
 	}
 
 
-	return kubernetes.NewForConfigOrDie(config)
+	return kubernetes.NewForConfigOrDie(config), config
 }
 
 func InClusterConfig() (*rest.Config, error) {

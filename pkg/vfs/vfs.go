@@ -18,7 +18,10 @@ type FreshChildFunc func(PrevObj interface{}) ([]*Node, interface{}, error)
 
 func (n *Node) CatNode() string {
 	b, _ := yaml.Marshal(n.Obj)
-	return string(b)
+	if b != nil {
+		return string(b)
+	}
+	return ""
 }
 
 func (n *Node) AddChild(child *Node) *Node {
