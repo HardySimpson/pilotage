@@ -3,8 +3,8 @@
 * [x] kube-config args
 * [x] inCluster running(done but not tested)
 * [ ] new command like cat/new/filter....
+    * [x] Cat
     * [ ] Create
-    * [ ] Read(cat resource)
     * [ ] Update(vi to change yaml)
     * [ ] Delete
 * [ ] vi to change yaml
@@ -17,8 +17,8 @@
 * [ ] Pipe
 * [ ] Refresh
 * [ ] any path cd
+
 ## Big Question
 
 * fix how to build and running apps, 合理的抽象模型
-
-1. ​
+​

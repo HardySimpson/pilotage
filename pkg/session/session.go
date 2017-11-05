@@ -62,6 +62,21 @@ func (s *Session) ls(c *ishell.Context) {
 	s.Shell.Println(strings.Join(s.currentNode.ListChildrenName(), " "))
 }
 
+func (s *Session) cat(c *ishell.Context) {
+	args := c.Args
+
+	var n *vfs.Node
+	if len(args) > 1 {
+		c.Println("pilotage cat: too many arguments")
+	} else if args[0] == "." {
+		n = s.currentNode
+	}
+
+	n = s.currentNode.GetChild(args[0])
+
+	s.Shell.Print(n.CatNode())
+}
+
 
 func New(k kubernetes.Interface) *Session {
 	s := &Session{
@@ -75,6 +90,12 @@ func New(k kubernetes.Interface) *Session {
 		Name: "cd",
 		Help: "change to a path",
 		Func: s.cd,
+		Completer: s.cdCompleter,
+	})
+	s.AddCmd(&ishell.Cmd{
+		Name: "cat",
+		Help: "show the content of this resource",
+		Func: s.cat,
 		Completer: s.cdCompleter,
 	})
 	s.AddCmd(&ishell.Cmd{

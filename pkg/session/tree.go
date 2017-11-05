@@ -30,7 +30,10 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 									return nil, nil, err
 								}
 								for _, podObj := range podList.Items {
-									mp = append(mp, &vfs.Node{Name:podObj.Name})
+									mp = append(mp, &vfs.Node{
+										Name: podObj.Name,
+										Obj: podObj,
+									})
 								}
 								return mp, podList, nil
 							},
@@ -45,7 +48,10 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 									return nil, nil, err
 								}
 								for _, item := range list.Items {
-									mp = append(mp, &vfs.Node{Name:item.Name})
+									mp = append(mp, &vfs.Node{
+										Name: item.Name,
+										Obj: item,
+									})
 								}
 								return mp, list, nil
 							},
@@ -59,7 +65,10 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 									return nil, nil, err
 								}
 								for _, item := range list.Items {
-									mp = append(mp, &vfs.Node{Name:item.Name})
+									mp = append(mp, &vfs.Node{
+										Name:item.Name,
+										Obj: item,
+									})
 								}
 								return mp, list, nil
 							},
@@ -73,7 +82,10 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 									return nil, nil, err
 								}
 								for _, item := range list.Items {
-									mp = append(mp, &vfs.Node{Name:item.Name})
+									mp = append(mp, &vfs.Node{
+										Name:item.Name,
+										Obj: item,
+									})
 								}
 								return mp, list, nil
 							},
@@ -87,7 +99,10 @@ func addDefaultTree(node *vfs.Node, cli kubernetes.Interface) {
 									return nil, nil, err
 								}
 								for _, item := range list.Items {
-									mp = append(mp, &vfs.Node{Name:item.Name})
+									mp = append(mp, &vfs.Node{
+										Name:item.Name,
+										Obj: item,
+									})
 								}
 								return mp, list, nil
 							},

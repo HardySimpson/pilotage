@@ -1,6 +1,9 @@
 package vfs
 
-import "path"
+import (
+	"github.com/ghodss/yaml"
+	"path"
+)
 
 type Node struct {
 	Name    string
@@ -13,6 +16,10 @@ type Node struct {
 
 type FreshChildFunc func(PrevObj interface{}) ([]*Node, interface{}, error)
 
+func (n *Node) CatNode() string {
+	b, _ := yaml.Marshal(n.Obj)
+	return string(b)
+}
 
 func (n *Node) AddChild(child *Node) *Node {
 	child.Parent = n
