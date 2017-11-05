@@ -8,15 +8,14 @@
     * [ ] Update(vi to change yaml)
     * [ ] Delete
 * [ ] vi to change yaml
+* [ ] Readme: run/build doc
 * [ ] file tree definition
     * tag system
     * ​
 * [ ] shell scripts grammer (powershell/haskell)
     * [ ] powershell: input...output is Obj but not text
-* [ ] Readme: run/build doc
 * [ ] Pipe
 * [ ] Refresh
-* [ ] any path cd
 
 ## Big Question
 
